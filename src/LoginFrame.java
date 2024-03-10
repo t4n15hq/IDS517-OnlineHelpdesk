@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,53 +13,70 @@ public class LoginFrame extends JFrame {
     private JButton registerButton;
 
     public LoginFrame() {
-        setTitle("Login");
+        setTitle("ResolveIT - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 300);
         setLocationRelativeTo(null); // Center the window on the screen
+        setLayout(new BorderLayout(5, 5)); // Use BorderLayout for overall frame layout
 
-        setLayout(new GridLayout(3, 2, 5, 5));
+        JPanel fieldsPanel = new JPanel();
+        fieldsPanel.setLayout(new GridLayout(3, 2, 10, 10)); // GridLayout for the fields and buttons
+        fieldsPanel.setBackground(Color.WHITE); // Set background color of fields panel
 
-        initializeComponents();
+        initializeComponents(fieldsPanel); // Pass the fields panel for adding components
+
+        add(fieldsPanel, BorderLayout.CENTER); // Add the fields panel to the center
+
+        pack(); // Adjusts window size to fit components
+        setSize(600, 300); // Ensure the window has a fixed size
     }
 
-    private void initializeComponents() {
+    private void initializeComponents(JPanel panel) {
         emailField = new JTextField();
         passwordField = new JPasswordField();
         loginButton = new JButton("Login");
         registerButton = new JButton("Register");
 
-        add(new JLabel("Email:"));
-        add(emailField);
-        add(new JLabel("Password:"));
-        add(passwordField);
-        add(loginButton);
-        add(registerButton);
+        // Center align the text fields
+        emailField.setHorizontalAlignment(JTextField.CENTER);
+        passwordField.setHorizontalAlignment(JTextField.CENTER);
 
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                performLogin();
-            }
+        // Adding components to the panel
+        panel.add(new JLabel("Email:", SwingConstants.CENTER));
+        panel.add(emailField);
+        panel.add(new JLabel("Password:", SwingConstants.CENTER));
+        panel.add(passwordField);
+        panel.add(loginButton);
+        panel.add(registerButton);
+
+        // Set the background of buttons and adjust their color
+        Color greenColor = new Color(0, 128, 0);
+        loginButton.setBackground(greenColor);
+        registerButton.setBackground(greenColor);
+        loginButton.setForeground(Color.WHITE);
+        registerButton.setForeground(Color.WHITE);
+
+        // Making buttons opaque to show the background color
+        loginButton.setOpaque(true);
+        registerButton.setOpaque(true);
+        loginButton.setBorderPainted(false); // Optional: remove the button border
+        registerButton.setBorderPainted(false);
+
+        // Add action listeners
+        loginButton.addActionListener(e -> performLogin());
+        registerButton.addActionListener(e -> {
+            RegistrationFrame registrationFrame = new RegistrationFrame();
+            registrationFrame.setVisible(true);
+            LoginFrame.this.setVisible(false); // Hide the login frame
         });
-
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Here you would open the registration frame
-                RegistrationFrame registrationFrame = new RegistrationFrame();
-                registrationFrame.setVisible(true);
-            }
-        });
-
-        pack(); // Adjusts window size to fit components
     }
 
     private void performLogin() {
-        // Example validation (replace with real validation logic)
-        if (verifyLogin(emailField.getText(), new String(passwordField.getPassword()))) {
+        String email = emailField.getText();
+        String password = new String(passwordField.getPassword());
+
+        if (verifyLogin(email, password)) {
             JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
-            this.setVisible(false); // Hide LoginFrame
+            this.dispose(); // Close LoginFrame
             DashboardFrame dashboardFrame = new DashboardFrame(); // Initialize Dashboard
             dashboardFrame.setVisible(true); // Show DashboardFrame
         } else {
@@ -69,25 +85,23 @@ public class LoginFrame extends JFrame {
     }
 
     private boolean verifyLogin(String email, String password) {
-        // Example database connection and query (ensure you handle exceptions appropriately)
-        String sql = "SELECT * FROM Users WHERE Email = ? AND Password = ?"; // Simplified; passwords should be hashed and checked securely
+        String sql = "SELECT * FROM Users WHERE Email = ? AND Password = ?";
 
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             pstmt.setString(2, password);
 
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                // User found, credentials are valid
-                return true;
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); // User found, credentials are valid
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            // Handle exception (e.g., logging, user feedback)
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        // User not found or credentials are invalid
-        return false;
+        return false; // User not found or credentials are invalid
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }

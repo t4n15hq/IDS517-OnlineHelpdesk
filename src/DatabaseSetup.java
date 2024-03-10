@@ -43,14 +43,15 @@ public class DatabaseSetup {
                 + " RequestID INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                 + " Title TEXT NOT NULL,\n"
                 + " Description TEXT NOT NULL,\n"
-                + " Priority TEXT NOT NULL,\n" // Added Priority column
-                + " Severity TEXT NOT NULL,\n" // Added Severity column
-                + " SubmittedBy INTEGER,\n"
-                + " AssignedTo INTEGER,\n"
-                + " Status TEXT NOT NULL,\n"
-                + " FOREIGN KEY (SubmittedBy) REFERENCES Users(UserID),\n"
-                + " FOREIGN KEY (AssignedTo) REFERENCES Users(UserID)\n"
+                + " Priority TEXT NOT NULL,\n"
+                + " Severity TEXT NOT NULL,\n"
+                + " SubmittedBy TEXT NOT NULL,\n"
+                + " AssignedTo TEXT DEFAULT 'Helpdesk',\n"
+                + " Status TEXT DEFAULT 'Pending',\n"
+                + " Comment TEXT\n"
                 + ");";
+
+
 
         try (Connection conn = this.connect();
              Statement stmt = conn.createStatement()) {
