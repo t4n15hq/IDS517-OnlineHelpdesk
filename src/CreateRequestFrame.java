@@ -13,10 +13,10 @@ public class CreateRequestFrame extends JFrame {
 
     public CreateRequestFrame() {
         setTitle("Create New Request");
-        getContentPane().setBackground(new Color(0, 128, 0)); // Green background
-        initializeComponents();
+        getContentPane().setBackground(new Color(0, 128, 0)); // Set background color
+        initializeComponents(); // Initialize UI components
         pack();
-        setLocationRelativeTo(null); // Center the window on the screen
+        setLocationRelativeTo(null); // Center the window
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
@@ -26,8 +26,9 @@ public class CreateRequestFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // Create text fields and combo boxes
         titleField = new JTextField(20);
-        makeComponentOpaque(titleField);
+        makeComponentOpaque(titleField); // Make components opaque and set colors
 
         descriptionArea = new JTextArea(5, 20);
         makeComponentOpaque(descriptionArea);
@@ -55,6 +56,7 @@ public class CreateRequestFrame extends JFrame {
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Add labels, fields, and button to the grid panel
         gridPanel.add(new JLabel("Title:"), gbc);
         gridPanel.add(titleField, gbc);
         gridPanel.add(new JLabel("Description:"), gbc);
@@ -67,33 +69,37 @@ public class CreateRequestFrame extends JFrame {
         gridPanel.add(submittedByNameField, gbc);
         gridPanel.add(submitButton, gbc);
 
+        // Attach action listener to the submit button
         submitButton.addActionListener(this::submitRequest);
         getContentPane().add(gridPanel); // Add gridPanel to the frame's content pane
     }
 
+    // Method to make components opaque and set colors
     private void makeComponentOpaque(JComponent component) {
         component.setOpaque(true);
-        component.setBackground(Color.WHITE); // Set the background to white
-        component.setForeground(new Color(0, 0, 0)); // Set the text to green
+        component.setBackground(Color.WHITE); // Set background to white
+        component.setForeground(new Color(0, 0, 0)); // Set text color to black
     }
 
+    // Method to style the submit button
     private void styleButton(JButton button) {
         button.setOpaque(true);
-        button.setBackground(new Color(0, 0, 0)); // Green background
-        button.setForeground(Color.WHITE); // White text
-        button.setBorderPainted(false); // No border painting
+        button.setBackground(new Color(0, 0, 0)); // Set background to green
+        button.setForeground(Color.WHITE); // Set text color to white
+        button.setBorderPainted(false); // Disable border painting
     }
 
+    // Method to handle request submission
     private void submitRequest(ActionEvent e) {
         String title = titleField.getText();
         String description = descriptionArea.getText();
         String priority = (String) priorityComboBox.getSelectedItem();
         String severity = (String) severityComboBox.getSelectedItem();
-        String submittedByName = submittedByNameField.getText(); // Collect the submitted by name
+        String submittedByName = submittedByNameField.getText(); // Collect submitted by name
 
         String sql = "INSERT INTO ServiceRequests(Title, Description, Priority, Severity, SubmittedBy) VALUES(?,?,?,?,?)";
 
-        // Replace with your actual database connection logic
+        // database connection logic
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, title);
@@ -103,7 +109,7 @@ public class CreateRequestFrame extends JFrame {
             pstmt.setString(5, submittedByName);
             pstmt.executeUpdate();
             JOptionPane.showMessageDialog(this, "Request submitted successfully!");
-            this.dispose(); // Close the window after successful submission
+            this.dispose(); // Close window after successful submission
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Failed to submit the request: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
