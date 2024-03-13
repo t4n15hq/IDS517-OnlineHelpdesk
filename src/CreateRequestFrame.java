@@ -6,9 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class CreateRequestFrame extends JFrame {
-    private JTextField titleField, submittedByNameField;
+    private JTextField submittedByNameField;
     private JTextArea descriptionArea;
-    private JComboBox<String> priorityComboBox, severityComboBox;
+    private JComboBox<String> problemComboBox, severityComboBox;
     private JButton submitButton;
 
     public CreateRequestFrame() {
@@ -27,18 +27,9 @@ public class CreateRequestFrame extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Create text fields and combo boxes
-        titleField = new JTextField(20);
-        makeComponentOpaque(titleField); // Make components opaque and set colors
+        problemComboBox = new JComboBox<>(new String[]{"Network Connectivity Issue", "Software Installation Problem", "Hardware Malfunction", "Password Reset Request", "Printer not Working", "Email Configuration Issue", "File Access Permission Problem", "Slow System Performance", "Website Access Problem", "Application Crashing", "Data Backup Request", "System Update Request", "Account Lockout Issue"});
 
-        descriptionArea = new JTextArea(5, 20);
-        makeComponentOpaque(descriptionArea);
-        JScrollPane descriptionScrollPane = new JScrollPane(descriptionArea);
-        descriptionScrollPane.setOpaque(true);
-        descriptionScrollPane.getViewport().setOpaque(true);
-
-        String[] priorities = {"High", "Medium", "Low"};
-        priorityComboBox = new JComboBox<>(priorities);
-        makeComponentOpaque(priorityComboBox);
+        makeComponentOpaque(problemComboBox); // Make components opaque and set colors
 
         String[] severities = {"Critical", "Major", "Minor"};
         severityComboBox = new JComboBox<>(severities);
@@ -46,6 +37,12 @@ public class CreateRequestFrame extends JFrame {
 
         submittedByNameField = new JTextField(20);
         makeComponentOpaque(submittedByNameField);
+
+        descriptionArea = new JTextArea(5, 20);
+        makeComponentOpaque(descriptionArea);
+        JScrollPane descriptionScrollPane = new JScrollPane(descriptionArea);
+        descriptionScrollPane.setOpaque(true);
+        descriptionScrollPane.getViewport().setOpaque(true);
 
         submitButton = new JButton("Submit");
         styleButton(submitButton);
@@ -57,16 +54,14 @@ public class CreateRequestFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Add labels, fields, and button to the grid panel
-        gridPanel.add(new JLabel("Title:"), gbc);
-        gridPanel.add(titleField, gbc);
-        gridPanel.add(new JLabel("Description:"), gbc);
-        gridPanel.add(descriptionScrollPane, gbc);
-        gridPanel.add(new JLabel("Priority:"), gbc);
-        gridPanel.add(priorityComboBox, gbc);
+        gridPanel.add(new JLabel("Problem:"), gbc);
+        gridPanel.add(problemComboBox, gbc);
         gridPanel.add(new JLabel("Severity:"), gbc);
         gridPanel.add(severityComboBox, gbc);
         gridPanel.add(new JLabel("Submitted By:"), gbc);
         gridPanel.add(submittedByNameField, gbc);
+        gridPanel.add(new JLabel("Description:"), gbc);
+        gridPanel.add(descriptionScrollPane, gbc);
         gridPanel.add(submitButton, gbc);
 
         // Attach action listener to the submit button
@@ -91,24 +86,22 @@ public class CreateRequestFrame extends JFrame {
 
     // Method to handle request submission
     private void submitRequest(ActionEvent e) {
-        String title = titleField.getText();
-        String description = descriptionArea.getText();
-        String priority = (String) priorityComboBox.getSelectedItem();
+        String problem = (String) problemComboBox.getSelectedItem();
         String severity = (String) severityComboBox.getSelectedItem();
         String submittedByName = submittedByNameField.getText(); // Collect submitted by name
+        String description = descriptionArea.getText(); // Collect description
 
-        String sql = "INSERT INTO ServiceRequests(Title, Description, Priority, Severity, SubmittedBy) VALUES(?,?,?,?,?)";
+        String sql = "INSERT INTO ServiceRequests(Problem, Severity, SubmittedBy, Description) VALUES(?,?,?,?)";
 
         // database connection logic
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, title);
-            pstmt.setString(2, description);
-            pstmt.setString(3, priority);
-            pstmt.setString(4, severity);
-            pstmt.setString(5, submittedByName);
+            pstmt.setString(1, problem);
+            pstmt.setString(2, severity);
+            pstmt.setString(3, submittedByName);
+            pstmt.setString(4, description);
             pstmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Request submitted successfully!");
+            JOptionPane.showMessageDialog(this, "Your request has been submitted successfully. Helpdesk team will reach out to you within 4 hours.");
             this.dispose(); // Close window after successful submission
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Failed to submit the request: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

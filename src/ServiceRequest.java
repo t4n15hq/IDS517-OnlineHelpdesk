@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ServiceRequest {
     private int requestID;
-    private String title;
+    private String problem;
     private String description;
     private int submittedBy;
     private Integer assignedTo; // This can be null if not yet assigned
@@ -16,9 +16,9 @@ public class ServiceRequest {
     // Constructors, getters, and setters as needed
 
     // Submit a new service request
-    public static boolean submitRequest(int userID, String title, String description) {
-        String sql = "INSERT INTO ServiceRequests(Title, Description, SubmittedBy, Status) VALUES(?,?,?,?)";
-        return DatabaseHelper.executeUpdate(sql, new Object[]{title, description, userID, "Submitted"});
+    public static boolean submitRequest(int userID, String problem, String description) {
+        String sql = "INSERT INTO ServiceRequests(Problem, Description, SubmittedBy, Status) VALUES(?,?,?,?)";
+        return DatabaseHelper.executeUpdate(sql, new Object[]{problem, description, userID, "Submitted"});
     }
 
     // View service requests, differentiating based on user role
@@ -44,7 +44,7 @@ public class ServiceRequest {
             while (rs.next()) {
                 ServiceRequest sr = new ServiceRequest();
                 sr.requestID = rs.getInt("RequestID");
-                sr.title = rs.getString("Title");
+                sr.problem = rs.getString("Problem");
                 sr.description = rs.getString("Description");
                 sr.submittedBy = rs.getInt("SubmittedBy");
                 sr.assignedTo = (Integer) rs.getObject("AssignedTo"); // Handle possible null value
@@ -73,6 +73,7 @@ public class ServiceRequest {
             sql += " AND AssignedTo = ?";
             return DatabaseHelper.executeUpdate(sql, new Object[]{newStatus, requestID, userID});
         }
+
     }
 
     // Additional methods as needed for comments, etc.

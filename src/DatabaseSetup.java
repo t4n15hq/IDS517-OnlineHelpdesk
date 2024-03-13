@@ -38,18 +38,23 @@ public class DatabaseSetup {
                 + " Password TEXT NOT NULL\n"
                 + ");";
 
-        // SQL statement for creating a new ServiceRequests table
-        String sqlServiceRequests = "CREATE TABLE IF NOT EXISTS ServiceRequests (\n"
-                + " RequestID INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                + " Title TEXT NOT NULL,\n"
-                + " Description TEXT NOT NULL,\n"
-                + " Priority TEXT NOT NULL,\n"
-                + " Severity TEXT NOT NULL,\n"
-                + " SubmittedBy TEXT NOT NULL,\n"
-                + " AssignedTo TEXT DEFAULT 'Helpdesk',\n"
-                + " Status TEXT DEFAULT 'Pending',\n"
-                + " Comment TEXT\n"
+        // Adjusted SQL statement for creating a new ServiceRequests table
+        String sqlServiceRequests = "CREATE TABLE IF NOT EXISTS ServiceRequests ("
+                + " RequestID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " Problem TEXT NOT NULL,"
+                + " Severity TEXT NOT NULL,"
+                + " SubmittedBy INTEGER NOT NULL,"
+                + " Description TEXT NOT NULL,"
+                + " Priority TEXT,"
+                + " AssignedTo INTEGER DEFAULT NULL,"
+                + " Status TEXT DEFAULT 'Pending',"
+                + " Comment TEXT,"
+                + " Timestamp DATETIME CURRENT_TIMESTAMP,"
+                + " ResolutionDate DATETIME DATETIME,"
+                + " EstimatedResolutionDate DATETIME"
                 + ");";
+
+
 
 
 
@@ -57,7 +62,7 @@ public class DatabaseSetup {
              Statement stmt = conn.createStatement()) {
             // Create the Users table
             stmt.execute(sqlUsers);
-            // Create the ServiceRequests table
+            // Create the ServiceRequests table with adjusted schema
             stmt.execute(sqlServiceRequests);
             System.out.println("Tables created successfully.");
         } catch (SQLException e) {

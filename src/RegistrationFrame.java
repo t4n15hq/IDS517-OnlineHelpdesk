@@ -18,7 +18,7 @@ public class RegistrationFrame extends JFrame {
 
         nameField = new JTextField();
         emailField = new JTextField();
-        roleComboBox = new JComboBox<>(new String[]{"User", "Helpdesk", "Manager"});
+        roleComboBox = new JComboBox<>(new String[]{"User", "Helpdesk", "Supervisor"});
         passwordField = new JPasswordField();
         registerButton = new JButton("Register");
 
