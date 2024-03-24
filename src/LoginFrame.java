@@ -1,10 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class LoginFrame extends JFrame {
     private JTextField emailField;
@@ -62,7 +63,7 @@ public class LoginFrame extends JFrame {
         registerButton.setBorderPainted(false);
 
         // Add action listeners
-        loginButton.addActionListener(e -> performLogin());
+        loginButton.addActionListener(this::performLogin);
         registerButton.addActionListener(e -> {
             RegistrationFrame registrationFrame = new RegistrationFrame();
             registrationFrame.setVisible(true);
@@ -70,35 +71,33 @@ public class LoginFrame extends JFrame {
         });
     }
 
-    private void performLogin() {
+    private void performLogin(ActionEvent e) {
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
 
-        if (verifyLogin(email, password)) {
-            JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose(); // Close LoginFrame
-            DashboardFrame dashboardFrame = new DashboardFrame(); // Initialize Dashboard
-            dashboardFrame.setVisible(true); // Show DashboardFrame
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid email or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+        // Attempt to connect to the server and send login credentials
+        try (Socket socket = new Socket("localhost", 6868);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-    private boolean verifyLogin(String email, String password) {
-        String sql = "SELECT * FROM Users WHERE Email = ? AND Password = ?";
+            // Command format: "login,email,password"
+            out.println("login," + email + "," + password);
 
-        try (Connection conn = DatabaseHelper.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next(); // User found, credentials are valid
+            // Await and process the server's response
+            String response = in.readLine();
+            if ("success".equals(response)) {
+                JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+                // Proceed to another frame if login is successful
+                // For example, to a dashboard frame
+                this.dispose(); // Close the login window
+                DashboardFrame dashboardFrame = new DashboardFrame();
+                dashboardFrame.setVisible(true); // Assume you have a DashboardFrame for the next window
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid email or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error connecting to the server: " + ex.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
         }
-        return false; // User not found or credentials are invalid
     }
 
     public static void main(String[] args) {

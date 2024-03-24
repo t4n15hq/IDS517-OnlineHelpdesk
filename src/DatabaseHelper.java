@@ -54,4 +54,18 @@ public class DatabaseHelper {
             return false;
         }
     }
-}
+
+    public static boolean loginUser(String email, String password) {
+        String sql = "SELECT * FROM Users WHERE Email = ? AND Password = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); // If a row is returned, the login is successful
+            }
+        } catch (SQLException e) {
+            System.out.println("Login failed: " + e.getMessage());
+            return false; // If there's an exception, login is considered failed
+        }
+}}
