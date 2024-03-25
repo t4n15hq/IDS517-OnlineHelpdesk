@@ -13,68 +13,47 @@ public class ServiceRequest {
     private Integer assignedTo; // This can be null if not yet assigned
     private String status;
 
-    // Constructors, getters, and setters as needed
+    // Constructor to populate object from a ResultSet
+    public ServiceRequest(ResultSet rs) throws SQLException {
+        this.requestID = rs.getInt("RequestID");
+        this.problem = rs.getString("Problem");
+        this.description = rs.getString("Description");
+        this.submittedBy = rs.getInt("SubmittedBy");
+        this.assignedTo = (Integer) rs.getObject("AssignedTo");
+        this.status = rs.getString("Status");
+    }
 
     // Submit a new service request
     public static boolean submitRequest(int userID, String problem, String description) {
-        String sql = "INSERT INTO ServiceRequests(Problem, Description, SubmittedBy, Status) VALUES(?,?,?,?)";
-        return DatabaseHelper.executeUpdate(sql, new Object[]{problem, description, userID, "Submitted"});
+        String sql = "INSERT INTO ServiceRequests(Problem, Description, SubmittedBy, Status) VALUES(?,?,?, 'Submitted')";
+        return DatabaseHelper.executeUpdate(sql, new Object[]{problem, description, userID});
     }
 
-    // View service requests, differentiating based on user role
-    public static List<ServiceRequest> viewRequests(int userID, String userRole) {
+    // View service requests by status
+    public static List<ServiceRequest> viewRequestsByStatus(String status) {
         List<ServiceRequest> requests = new ArrayList<>();
-        String sql;
-
-        if ("Helpdesk".equals(userRole) || "Manager".equals(userRole)) {
-            sql = "SELECT * FROM ServiceRequests";
-        } else {
-            sql = "SELECT * FROM ServiceRequests WHERE SubmittedBy = ?";
-        }
-
+        String sql = "SELECT * FROM ServiceRequests WHERE Status = ?";
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            if (!"Helpdesk".equals(userRole) && !"Manager".equals(userRole)) {
-                pstmt.setInt(1, userID);
-            }
-
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                ServiceRequest sr = new ServiceRequest();
-                sr.requestID = rs.getInt("RequestID");
-                sr.problem = rs.getString("Problem");
-                sr.description = rs.getString("Description");
-                sr.submittedBy = rs.getInt("SubmittedBy");
-                sr.assignedTo = (Integer) rs.getObject("AssignedTo"); // Handle possible null value
-                sr.status = rs.getString("Status");
-                requests.add(sr);
+            pstmt.setString(1, status);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    requests.add(new ServiceRequest(rs));
+                }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-
         return requests;
     }
 
-    // Assign a service request to a helpdesk user
-    public static boolean assignRequest(int requestID, int helpdeskUserID) {
-        String sql = "UPDATE ServiceRequests SET AssignedTo = ?, Status = 'InProgress' WHERE RequestID = ? AND Status = 'Submitted'";
-        return DatabaseHelper.executeUpdate(sql, new Object[]{helpdeskUserID, requestID});
-    }
+    // Other methods...
 
-    // Update the status of a service request
-    public static boolean updateRequestStatus(int requestID, String newStatus, int userID, String userRole) {
-        String sql = "UPDATE ServiceRequests SET Status = ? WHERE RequestID = ?";
-        if ("Manager".equals(userRole)) {
-            return DatabaseHelper.executeUpdate(sql, new Object[]{newStatus, requestID});
-        } else {
-            sql += " AND AssignedTo = ?";
-            return DatabaseHelper.executeUpdate(sql, new Object[]{newStatus, requestID, userID});
-        }
-
-    }
-
-    // Additional methods as needed for comments, etc.
+    // Getters and setters
+    public int getRequestID() { return requestID; }
+    public String getProblem() { return problem; }
+    public String getDescription() { return description; }
+    public int getSubmittedBy() { return submittedBy; }
+    public Integer getAssignedTo() { return assignedTo; }
+    public String getStatus() { return status; }
 }

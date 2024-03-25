@@ -9,7 +9,7 @@ public class CreateRequestFrame extends JFrame {
     private JTextField submittedByNameField;
     private JTextArea descriptionArea;
     private JComboBox<String> problemComboBox, severityComboBox;
-    private JButton submitButton;
+    private JButton submitButton, knowledgeBaseButton;
 
     public CreateRequestFrame() {
         setTitle("Create New Request");
@@ -47,13 +47,20 @@ public class CreateRequestFrame extends JFrame {
         submitButton = new JButton("Submit");
         styleButton(submitButton);
 
+        knowledgeBaseButton = new JButton("Knowledge Base / FAQ");
+        knowledgeBaseButton.addActionListener(e -> {
+            // Create and show the KnowledgeBaseFrame instance here
+            KnowledgeBaseFrame knowledgeBaseFrame = new KnowledgeBaseFrame();
+            knowledgeBaseFrame.setVisible(true);
+        });
+
         JPanel gridPanel = new JPanel(new GridBagLayout());
         gridPanel.setOpaque(false); // Use the background color of the content pane
 
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Add labels, fields, and button to the grid panel
+        // Add labels, fields, and buttons to the grid panel
         gridPanel.add(new JLabel("Problem:"), gbc);
         gridPanel.add(problemComboBox, gbc);
         gridPanel.add(new JLabel("Severity:"), gbc);
@@ -62,7 +69,10 @@ public class CreateRequestFrame extends JFrame {
         gridPanel.add(submittedByNameField, gbc);
         gridPanel.add(new JLabel("Description:"), gbc);
         gridPanel.add(descriptionScrollPane, gbc);
+
+        gridPanel.add(new JLabel("Helpdesk Contact : ids517helpdesk@gmail.com"), gbc);
         gridPanel.add(submitButton, gbc);
+        gridPanel.add(knowledgeBaseButton, gbc);
 
         // Attach action listener to the submit button
         submitButton.addActionListener(this::submitRequest);

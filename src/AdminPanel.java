@@ -203,13 +203,14 @@ public class AdminPanel extends JFrame {
 
         int option = JOptionPane.showConfirmDialog(null, message, "Add New Service Request", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            String sql = "INSERT INTO ServiceRequests (Problem, Severity, Description, Status) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO ServiceRequests (Problem, Severity, Description, Status, SubmittedBy) VALUES (?, ?, ?, ?, ?)";
             try (Connection conn = DatabaseHelper.connect();
                  PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, problemField.getText());
                 pstmt.setString(2, severityField.getText());
                 pstmt.setString(3, descriptionArea.getText());
-                pstmt.setString(4, (String)statusComboBox.getSelectedItem());
+                pstmt.setString(4, (String) statusComboBox.getSelectedItem());
+                pstmt.setInt(5, 1);  // Replace 1 with the ID of the logged-in user
                 pstmt.executeUpdate();
                 loadServiceRequestsData(); // Refresh the displayed data
             } catch (SQLException ex) {
@@ -217,6 +218,7 @@ public class AdminPanel extends JFrame {
             }
         }
     }
+
 
 
     private void editSelectedRequest(ActionEvent e) {

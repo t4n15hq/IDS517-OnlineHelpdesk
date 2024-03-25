@@ -12,6 +12,7 @@ public class LoginFrame extends JFrame {
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton registerButton;
+    private JButton adminButton; // New button for opening Admin Panel.
 
     public LoginFrame() {
         setTitle("ResolveIT - Login");
@@ -27,6 +28,10 @@ public class LoginFrame extends JFrame {
 
         add(fieldsPanel, BorderLayout.CENTER); // Add the fields panel to the center
 
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        bottomPanel.add(adminButton);
+        add(bottomPanel, BorderLayout.SOUTH); // Add the bottom panel to the south
+
         pack(); // Adjusts window size to fit components
         setSize(600, 300); // Ensure the window has a fixed size
     }
@@ -36,6 +41,7 @@ public class LoginFrame extends JFrame {
         passwordField = new JPasswordField();
         loginButton = new JButton("Login");
         registerButton = new JButton("Register");
+        adminButton = new JButton("Admin Panel");
 
         // Center align the text fields
         emailField.setHorizontalAlignment(JTextField.CENTER);
@@ -53,14 +59,18 @@ public class LoginFrame extends JFrame {
         Color greenColor = new Color(0, 128, 0);
         loginButton.setBackground(greenColor);
         registerButton.setBackground(greenColor);
+        adminButton.setBackground(greenColor);
         loginButton.setForeground(Color.WHITE);
         registerButton.setForeground(Color.WHITE);
+        adminButton.setForeground(Color.WHITE);
 
         // Making buttons opaque to show the background color
         loginButton.setOpaque(true);
         registerButton.setOpaque(true);
+        adminButton.setOpaque(true);
         loginButton.setBorderPainted(false); // Optional: remove the button border
         registerButton.setBorderPainted(false);
+        adminButton.setBorderPainted(false);
 
         // Add action listeners
         loginButton.addActionListener(this::performLogin);
@@ -68,6 +78,11 @@ public class LoginFrame extends JFrame {
             RegistrationFrame registrationFrame = new RegistrationFrame();
             registrationFrame.setVisible(true);
             LoginFrame.this.setVisible(false); // Hide the login frame
+        });
+        adminButton.addActionListener(e -> {
+            AdminPanel adminPanel = new AdminPanel();
+            adminPanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Set the close operation for AdminFrame
+            adminPanel.setVisible(true);
         });
     }
 
