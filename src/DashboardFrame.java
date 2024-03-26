@@ -6,7 +6,7 @@ public class DashboardFrame extends JFrame {
     private JButton backButton;
     public DashboardFrame() {
         setTitle("ResolveIT Dashboard");
-        setSize(400, 300); // Set initial size
+        setSize(400, 400); // Set initial size
         setLocationRelativeTo(null); // Center on screen
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(new Color(0, 128, 0)); // Set a green background
@@ -16,7 +16,7 @@ public class DashboardFrame extends JFrame {
 
         // Welcome label at the top
         JLabel welcomeLabel = new JLabel("Welcome to ResolveIT!", JLabel.CENTER);
-        welcomeLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        welcomeLabel.setFont(new Font("Dialog", Font.BOLD, 20));
         welcomeLabel.setForeground(Color.BLACK); // Set text color to black for contrast
         add(welcomeLabel, BorderLayout.NORTH);
 
@@ -47,7 +47,7 @@ public class DashboardFrame extends JFrame {
         add(buttonPanel, BorderLayout.CENTER);
 
         // Back Button
-        backButton = new JButton("Back");
+        backButton = new JButton("Log Out");
         styleButton(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -70,7 +70,7 @@ public class DashboardFrame extends JFrame {
         button.setBackground(Color.WHITE); // Set background color to white
         button.setForeground(Color.BLACK); // Set text color to black
         button.setFocusPainted(false); // Remove focus border
-        button.setFont(new Font("Serif", Font.BOLD, 16)); // Font styling
+        button.setFont(new Font("Dialog", Font.BOLD, 16)); // Font styling
     }
 
     public static void main(String[] args) {
