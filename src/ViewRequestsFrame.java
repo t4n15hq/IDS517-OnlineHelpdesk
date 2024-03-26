@@ -25,7 +25,7 @@ public class ViewRequestsFrame extends JFrame {
         initializeTable();
         loadDataFromDatabase();
         initializeSupervisorLoginButton();
-        setSize(800, 600);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setVisible(true);
     }

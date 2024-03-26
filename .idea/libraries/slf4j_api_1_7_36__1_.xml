@@ -4,6 +4,9 @@
       <root url="jar://$USER_HOME$/Downloads/slf4j-api-1.7.36 (1).jar!/" />
       <root url="jar://$USER_HOME$/Downloads/sqlite-jdbc-3.45.1.0.jar!/" />
       <root url="jar://$USER_HOME$/Downloads/javax.mail-1.6.2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/activation.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/javax.mail.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/mail.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

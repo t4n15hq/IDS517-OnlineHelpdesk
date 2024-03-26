@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CreateRequestFrame extends JFrame {
@@ -10,6 +11,8 @@ public class CreateRequestFrame extends JFrame {
     private JTextArea descriptionArea;
     private JComboBox<String> problemComboBox, severityComboBox;
     private JButton submitButton, knowledgeBaseButton;
+    private final EmailService emailService; // Instance variable
+    private final ServiceRequestHandler requestHandler; // Instance variable
 
     public CreateRequestFrame() {
         setTitle("Create New Request");
@@ -18,8 +21,9 @@ public class CreateRequestFrame extends JFrame {
         pack();
         setLocationRelativeTo(null); // Center the window
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        emailService = new EmailService(); // Initialize EmailService
+        requestHandler = new ServiceRequestHandler(emailService); // Initialize ServiceRequestHandler
     }
-
     private void initializeComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -102,7 +106,7 @@ public class CreateRequestFrame extends JFrame {
         String description = descriptionArea.getText(); // Collect description
 
         String sql = "INSERT INTO ServiceRequests(Problem, Severity, SubmittedBy, Description) VALUES(?,?,?,?)";
-
+        int generatedId = -1;
         // database connection logic
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -110,8 +114,30 @@ public class CreateRequestFrame extends JFrame {
             pstmt.setString(2, severity);
             pstmt.setString(3, submittedByName);
             pstmt.setString(4, description);
-            pstmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Your request has been submitted successfully. Helpdesk team will reach out to you within 4 hours.");
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        generatedId = generatedKeys.getInt(1);
+                    }
+                }
+            }
+
+            // Send email notification using the existing EmailService instance
+            String recipientEmail = "ids517helpdesk@gmail.com";
+            String subject = "New Service Request Created";
+            String body = "A new service request has been created:\n\n" +
+                    "Problem: " + problem + "\n" +
+                    "Severity: " + severity + "\n" +
+                    "Submitted By: " + submittedByName + "\n" +
+                    "Description: " + description;
+            emailService.sendEmail(recipientEmail, subject, body);
+
+            // Process pending requests (optional)
+            requestHandler.processPendingRequests();
+
+            JOptionPane.showMessageDialog(this, "Your request has been submitted successfully. Your ticket ID is " + generatedId + ". Helpdesk team will reach out to you within 4 hours.");
             this.dispose(); // Close window after successful submission
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Failed to submit the request: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

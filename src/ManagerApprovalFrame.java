@@ -19,7 +19,7 @@ public class ManagerApprovalFrame extends JFrame {
     public ManagerApprovalFrame() {
         setTitle("Supervisor Request Panel");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1200, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 

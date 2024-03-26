@@ -11,7 +11,7 @@ public class LoginFrame extends JFrame {
     private JTextField emailField;
     private JPasswordField passwordField;
     private JButton loginButton;
-    private JButton registerButton;
+    //private JButton registerButton;
     private JButton adminButton; // New button for opening Admin Panel.
 
     public LoginFrame() {
@@ -33,58 +33,79 @@ public class LoginFrame extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH); // Add the bottom panel to the south
 
         pack(); // Adjusts window size to fit components
-        setSize(600, 300); // Ensure the window has a fixed size
+        setSize(600, 600); // Ensure the window has a fixed size
     }
 
     private void initializeComponents(JPanel panel) {
-        emailField = new JTextField();
-        passwordField = new JPasswordField();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        emailField = new JTextField(10);
+        passwordField = new JPasswordField(10);
         loginButton = new JButton("Login");
-        registerButton = new JButton("Register");
         adminButton = new JButton("Admin Panel");
 
-        // Center align the text fields
         emailField.setHorizontalAlignment(JTextField.CENTER);
         passwordField.setHorizontalAlignment(JTextField.CENTER);
 
-        // Adding components to the panel
-        panel.add(new JLabel("Username:", SwingConstants.CENTER));
-        panel.add(emailField);
-        panel.add(new JLabel("Password:", SwingConstants.CENTER));
-        panel.add(passwordField);
-        panel.add(loginButton);
-        panel.add(registerButton);
+        ImageIcon originalIcon = new ImageIcon(getClass().getResource("ResolveIT.png"));
+        // Scale it to fit a specific size
+        Image scaledImage = originalIcon.getImage().getScaledInstance(375, 375, Image.SCALE_SMOOTH);
+        ImageIcon logo = new ImageIcon(scaledImage);
+        // Add the resized logo to the JLabel
+        JLabel logoLabel = new JLabel(logo);
+        gbc.anchor = GridBagConstraints.NORTH; // This will align the logo to the top center
+        panel.add(logoLabel, gbc);
 
-        // Set the background of buttons and adjust their color
-        Color greenColor = new Color(0, 128, 0);
-        loginButton.setBackground(greenColor);
-        registerButton.setBackground(greenColor);
-        adminButton.setBackground(greenColor);
+        panel.add(new JLabel("Username", SwingConstants.CENTER), gbc);
+        panel.add(emailField, gbc);
+        panel.add(new JLabel("Password", SwingConstants.CENTER), gbc);
+        panel.add(passwordField, gbc);
+
+        gbc.insets = new Insets(10, 0, 0, 0); // Top and bottom padding
+        System.out.println("\n\n"); // Two new lines for spacing
+
+        panel.add(loginButton, gbc);
+
+        loginButton.setBackground(new Color(0, 128, 0));
         loginButton.setForeground(Color.WHITE);
-        registerButton.setForeground(Color.WHITE);
-        adminButton.setForeground(Color.WHITE);
-
-        // Making buttons opaque to show the background color
         loginButton.setOpaque(true);
-        registerButton.setOpaque(true);
+        loginButton.setBorderPainted(false);
+
+        adminButton.setBackground(new Color(0, 128, 0));
+        adminButton.setForeground(Color.WHITE);
         adminButton.setOpaque(true);
-        loginButton.setBorderPainted(false); // Optional: remove the button border
-        registerButton.setBorderPainted(false);
         adminButton.setBorderPainted(false);
 
-        // Add action listeners
+        // Commented out code is retained for reference but will not be executed.
+    /*registerButton = new JButton("Register");
+    registerButton.setBackground(greenColor);
+    registerButton.setForeground(Color.WHITE);
+    registerButton.setOpaque(true);
+    registerButton.setBorderPainted(false);*/
+
+        // Adding action listeners
         loginButton.addActionListener(this::performLogin);
-        registerButton.addActionListener(e -> {
-            RegistrationFrame registrationFrame = new RegistrationFrame();
-            registrationFrame.setVisible(true);
-            LoginFrame.this.setVisible(false); // Hide the login frame
-        });
+    /*registerButton.addActionListener(e -> {
+        RegistrationFrame registrationFrame = new RegistrationFrame();
+        registrationFrame.setVisible(true);
+        LoginFrame.this.setVisible(false);
+    });*/
         adminButton.addActionListener(e -> {
             AdminPanel adminPanel = new AdminPanel();
-            adminPanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Set the close operation for AdminFrame
+            adminPanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             adminPanel.setVisible(true);
         });
+
+        // Admin button placed separately from the login button for clarity and potential different alignment.
+        JPanel adminButtonPanel = new JPanel();
+        adminButtonPanel.add(adminButton);
+        gbc.fill = GridBagConstraints.NONE; // Reset to default if you want the admin panel button not stretched.
+        panel.add(adminButtonPanel, gbc);
     }
+
 
     private void performLogin(ActionEvent e) {
         String email = emailField.getText();

@@ -1,8 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 public class DashboardFrame extends JFrame {
-
+    private JButton backButton;
     public DashboardFrame() {
         setTitle("ResolveIT Dashboard");
         setSize(400, 300); // Set initial size
@@ -14,7 +15,7 @@ public class DashboardFrame extends JFrame {
         setLayout(new BorderLayout(10, 10));
 
         // Welcome label at the top
-        JLabel welcomeLabel = new JLabel("Welcome to the ResolveIT!", JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("Welcome to ResolveIT!", JLabel.CENTER);
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 20));
         welcomeLabel.setForeground(Color.BLACK); // Set text color to black for contrast
         add(welcomeLabel, BorderLayout.NORTH);
@@ -44,6 +45,22 @@ public class DashboardFrame extends JFrame {
 
         // Add the button panel to the frame
         add(buttonPanel, BorderLayout.CENTER);
+
+        // Back Button
+        backButton = new JButton("Back");
+        styleButton(backButton);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle back button action here
+                // For example, navigate back to the login frame
+                dispose(); // Close the dashboard frame
+                new LoginFrame().setVisible(true); // Show the login frame
+            }
+        });
+
+        // Add the back button to the bottom of the frame
+        add(backButton, BorderLayout.SOUTH);
 
         // Ensure the window is correctly displayed
         setVisible(true);
