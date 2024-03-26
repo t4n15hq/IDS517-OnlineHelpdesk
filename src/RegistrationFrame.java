@@ -22,7 +22,7 @@ public class RegistrationFrame extends JFrame {
         passwordField = new JPasswordField();
         registerButton = new JButton("Register");
 
-        add(new JLabel("Name:"));
+        add(new JLabel("User Name:"));
         add(nameField);
         add(new JLabel("Email:"));
         add(emailField);

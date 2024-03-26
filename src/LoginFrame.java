@@ -48,7 +48,7 @@ public class LoginFrame extends JFrame {
         passwordField.setHorizontalAlignment(JTextField.CENTER);
 
         // Adding components to the panel
-        panel.add(new JLabel("Email:", SwingConstants.CENTER));
+        panel.add(new JLabel("Username:", SwingConstants.CENTER));
         panel.add(emailField);
         panel.add(new JLabel("Password:", SwingConstants.CENTER));
         panel.add(passwordField);
