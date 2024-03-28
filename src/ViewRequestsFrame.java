@@ -56,6 +56,12 @@ public class ViewRequestsFrame extends JFrame {
             }
         };
         requestsTable = new JTable(tableModel);
+
+        DarkCellRenderer darkRenderer = new DarkCellRenderer();
+        for (int i = 0; i < requestsTable.getColumnModel().getColumnCount(); i++) {
+            requestsTable.getColumnModel().getColumn(i).setCellRenderer(darkRenderer);
+        }
+
         JScrollPane scrollPane = new JScrollPane(requestsTable);
         scrollPane.getViewport().setBackground(Color.WHITE);
         add(scrollPane, BorderLayout.CENTER);
@@ -129,7 +135,7 @@ public class ViewRequestsFrame extends JFrame {
 
     private void initializeSupervisorLoginButton() {
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(0, 128, 0)); // Match the frame background
+        buttonPanel.setBackground(new Color(207, 216, 220)); // Match the frame background
         supervisorLoginButton = new JButton("Supervisor Login");
         supervisorLoginButton.addActionListener(e -> {
             // Create and show the ManagerApprovalFrame

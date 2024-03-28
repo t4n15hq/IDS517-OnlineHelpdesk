@@ -156,17 +156,22 @@ public class AdminPanel extends JFrame {
         Integer userID = (Integer) usersTable.getValueAt(selectedRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this user?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            String deleteSql = "DELETE FROM Users WHERE UserID = ?";
-            try (Connection connection = DatabaseHelper.connect();
-                 PreparedStatement preparedStatement = connection.prepareStatement(deleteSql)) {
-                preparedStatement.setInt(1, userID);
-                preparedStatement.executeUpdate();
-                loadUsersData();
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error deleting user: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            // Second confirmation
+            int confirmAgain = JOptionPane.showConfirmDialog(this, "This action cannot be undone. Are you absolutely sure?", "Confirm Delete Again", JOptionPane.YES_NO_OPTION);
+            if (confirmAgain == JOptionPane.YES_OPTION) {
+                String deleteSql = "DELETE FROM Users WHERE UserID = ?";
+                try (Connection connection = DatabaseHelper.connect();
+                     PreparedStatement preparedStatement = connection.prepareStatement(deleteSql)) {
+                    preparedStatement.setInt(1, userID);
+                    preparedStatement.executeUpdate();
+                    loadUsersData();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "Error deleting user: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }
+
 
     // Methods for Service Request Operations
     private void loadServiceRequestsData() {
@@ -262,10 +267,16 @@ public class AdminPanel extends JFrame {
 
     private void deleteSelectedRequest(ActionEvent e) {
         int selectedRow = serviceRequestsTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            Object requestID = serviceRequestsTable.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this service request?", "Delete Service Request", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a service request to delete.", "Selection Required", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Object requestID = serviceRequestsTable.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this service request?", "Delete Service Request", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Second confirmation
+            int confirmAgain = JOptionPane.showConfirmDialog(this, "This action cannot be undone. Are you absolutely sure?", "Confirm Delete Again", JOptionPane.YES_NO_OPTION);
+            if (confirmAgain == JOptionPane.YES_OPTION) {
                 String sql = "DELETE FROM ServiceRequests WHERE RequestID = ?";
                 try (Connection conn = DatabaseHelper.connect();
                      PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -276,10 +287,9 @@ public class AdminPanel extends JFrame {
                     JOptionPane.showMessageDialog(this, "Error deleting service request: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select a service request to delete.");
         }
     }
+
 
 
     public static void main(String[] args) {

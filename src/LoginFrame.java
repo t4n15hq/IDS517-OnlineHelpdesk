@@ -11,7 +11,7 @@ public class LoginFrame extends JFrame {
     private JTextField emailField;
     private JPasswordField passwordField;
     private JButton loginButton;
-    //private JButton registerButton;
+    private JButton registerButton;
     private JButton adminButton; // New button for opening Admin Panel.
 
     public LoginFrame() {
@@ -46,6 +46,7 @@ public class LoginFrame extends JFrame {
         passwordField = new JPasswordField(10);
         loginButton = new JButton("Login");
         adminButton = new JButton("Admin Panel");
+        registerButton = new JButton("Register");
 
         emailField.setHorizontalAlignment(JTextField.CENTER);
         passwordField.setHorizontalAlignment(JTextField.CENTER);
@@ -69,30 +70,30 @@ public class LoginFrame extends JFrame {
 
         panel.add(loginButton, gbc);
 
-        loginButton.setBackground(new Color(0, 128, 0));
-        loginButton.setForeground(Color.WHITE);
+        loginButton.setBackground(new Color(207, 216, 220));
+        loginButton.setForeground(Color.black);
         loginButton.setOpaque(true);
         loginButton.setBorderPainted(false);
 
-        adminButton.setBackground(new Color(0, 128, 0));
-        adminButton.setForeground(Color.WHITE);
+        adminButton.setBackground(new Color(207, 216, 220));
+        adminButton.setForeground(Color.black);
         adminButton.setOpaque(true);
         adminButton.setBorderPainted(false);
-
+        loginButton.addActionListener(this::performLogin);
         // Commented out code is retained for reference but will not be executed.
-    /*registerButton = new JButton("Register");
-    registerButton.setBackground(greenColor);
-    registerButton.setForeground(Color.WHITE);
-    registerButton.setOpaque(true);
-    registerButton.setBorderPainted(false);*/
+    registerButton = new JButton("Register");
+        registerButton.setBackground(new Color(207, 216, 220)); // Corrected
+        registerButton.setForeground(Color.BLACK);
+        registerButton.setOpaque(true);
+    registerButton.setBorderPainted(false);
 
         // Adding action listeners
-        loginButton.addActionListener(this::performLogin);
-    /*registerButton.addActionListener(e -> {
+
+    registerButton.addActionListener(e -> {
         RegistrationFrame registrationFrame = new RegistrationFrame();
         registrationFrame.setVisible(true);
         LoginFrame.this.setVisible(false);
-    });*/
+    });
         adminButton.addActionListener(e -> {
             AdminPanel adminPanel = new AdminPanel();
             adminPanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

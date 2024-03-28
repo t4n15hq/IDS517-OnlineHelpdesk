@@ -49,9 +49,10 @@ public class DatabaseSetup {
                 + " AssignedTo INTEGER DEFAULT NULL,"
                 + " Status TEXT DEFAULT 'Pending',"
                 + " Comment TEXT,"
-                + " Timestamp DATETIME CURRENT_TIMESTAMP,"
-                + " ResolutionDate DATETIME DATETIME,"
-                + " EstimatedResolutionDate DATETIME"
+                + " Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                + " ResolutionDate DATETIME DEFAULT NULL,"
+                + " EstimatedResolutionDate DATETIME DEFAULT NULL,"
+                + " FilePath TEXT" // This line adds a column for storing file paths
                 + ");";
 
 

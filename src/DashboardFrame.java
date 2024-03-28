@@ -9,7 +9,7 @@ public class DashboardFrame extends JFrame {
         setSize(400, 400); // Set initial size
         setLocationRelativeTo(null); // Center on screen
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getContentPane().setBackground(new Color(0, 128, 0)); // Set a green background
+        getContentPane().setBackground(new Color(207, 216, 220)); // Set a green background
 
         // Use a BorderLayout as the layout for this frame
         setLayout(new BorderLayout(10, 10));

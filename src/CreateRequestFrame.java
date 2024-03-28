@@ -1,6 +1,8 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,13 +12,14 @@ public class CreateRequestFrame extends JFrame {
     private JTextField submittedByNameField;
     private JTextArea descriptionArea;
     private JComboBox<String> problemComboBox, severityComboBox;
-    private JButton submitButton, knowledgeBaseButton;
+    private JButton submitButton, knowledgeBaseButton, browseFilesButton;
+    private JLabel uploadedFilesLabel;
     private final EmailService emailService; // Instance variable
     private final ServiceRequestHandler requestHandler; // Instance variable
 
     public CreateRequestFrame() {
         setTitle("Create New Request");
-        getContentPane().setBackground(new Color(0, 128, 0)); // Set background color
+        getContentPane().setBackground(new Color(207, 216, 220)); // Set background color
         initializeComponents(); // Initialize UI components
         pack();
         setLocationRelativeTo(null); // Center the window
@@ -24,6 +27,7 @@ public class CreateRequestFrame extends JFrame {
         emailService = new EmailService(); // Initialize EmailService
         requestHandler = new ServiceRequestHandler(emailService); // Initialize ServiceRequestHandler
     }
+
     private void initializeComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -35,12 +39,21 @@ public class CreateRequestFrame extends JFrame {
 
         makeComponentOpaque(problemComboBox); // Make components opaque and set colors
 
-        String[] severities = {"Critical", "Major", "Minor"};
+        String[] severities = {
+                "Severity 1 - Critical: System Down",
+                "Severity 2 - High: Major Functionality Impaired",
+                "Severity 3 - Medium: Minor Functionality Impaired",
+                "Severity 4 - Low: Cosmetic Issues"
+        };
         severityComboBox = new JComboBox<>(severities);
         makeComponentOpaque(severityComboBox);
 
         submittedByNameField = new JTextField(20);
+        submittedByNameField.setText(UserSession.getLoggedInUserName()); // Auto-populate with logged-in user's name
+        submittedByNameField.setEditable(false);
         makeComponentOpaque(submittedByNameField);
+
+
 
         descriptionArea = new JTextArea(5, 20);
         makeComponentOpaque(descriptionArea);
@@ -58,6 +71,11 @@ public class CreateRequestFrame extends JFrame {
             knowledgeBaseFrame.setVisible(true);
         });
 
+        browseFilesButton = new JButton("Browse Files");
+        browseFilesButton.addActionListener(this::browseFiles);
+
+        uploadedFilesLabel = new JLabel("No files uploaded");
+
         JPanel gridPanel = new JPanel(new GridBagLayout());
         gridPanel.setOpaque(false); // Use the background color of the content pane
 
@@ -71,8 +89,11 @@ public class CreateRequestFrame extends JFrame {
         gridPanel.add(severityComboBox, gbc);
         gridPanel.add(new JLabel("Submitted By:"), gbc);
         gridPanel.add(submittedByNameField, gbc);
-        gridPanel.add(new JLabel("Description:"), gbc);
+        gridPanel.add(new JLabel("Detailed Description // Summary:"), gbc);
         gridPanel.add(descriptionScrollPane, gbc);
+        gridPanel.add(new JLabel("Upload Files (logs, screenshots):"), gbc);
+        gridPanel.add(browseFilesButton, gbc);
+        gridPanel.add(uploadedFilesLabel, gbc);
 
         gridPanel.add(new JLabel("Helpdesk Contact : ids517helpdesk@gmail.com"), gbc);
         gridPanel.add(submitButton, gbc);
@@ -98,15 +119,53 @@ public class CreateRequestFrame extends JFrame {
         button.setBorderPainted(false); // Disable border painting
     }
 
+    // Method to handle file browsing
+    private void browseFiles(ActionEvent e) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(true);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files or Log Files", "jpg", "png", "gif", "log", "txt");
+        fileChooser.setFileFilter(filter);
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File[] selectedFiles = fileChooser.getSelectedFiles();
+            StringBuilder filesList = new StringBuilder();
+            for (File file : selectedFiles) {
+                filesList.append(file.getName()).append(", ");
+            }
+            if (filesList.length() > 0) {
+                filesList.setLength(filesList.length() - 2); // Remove the trailing comma and space
+            }
+            uploadedFilesLabel.setText(filesList.toString());
+            // TODO: Add code to handle the selected files (e.g., upload to a server or attach to the email)
+        }
+    }
+    private String getResponseTimeBySeverity(String severity) {
+        switch (severity) {
+            case "Severity 1 - Critical: System Down":
+                return "1 hour";
+            case "Severity 2 - High: Major Functionality Impaired":
+                return "2 hours";
+            case "Severity 3 - Medium: Minor Functionality Impaired":
+                return "3 hours";
+            case "Severity 4 - Low: Cosmetic Issues":
+                return "4 hours";
+            default:
+                return "N/A"; // Default case
+        }
+    }
+
+    // Method to handle request submission
+    // Method to handle request submission
     // Method to handle request submission
     private void submitRequest(ActionEvent e) {
         String problem = (String) problemComboBox.getSelectedItem();
         String severity = (String) severityComboBox.getSelectedItem();
-        String submittedByName = submittedByNameField.getText(); // Collect submitted by name
-        String description = descriptionArea.getText(); // Collect description
+        String submittedByName = submittedByNameField.getText();
+        String description = descriptionArea.getText();
+        String filePaths = uploadedFilesLabel.getText(); // Retrieves the text that potentially holds the file paths
 
-        String sql = "INSERT INTO ServiceRequests(Problem, Severity, SubmittedBy, Description) VALUES(?,?,?,?)";
-        int generatedId = -1;
+        String sql = "INSERT INTO ServiceRequests(Problem, Severity, SubmittedBy, Description, FilePath) VALUES(?,?,?,?,?)";
+
         // database connection logic
         try (Connection conn = DatabaseHelper.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -114,35 +173,35 @@ public class CreateRequestFrame extends JFrame {
             pstmt.setString(2, severity);
             pstmt.setString(3, submittedByName);
             pstmt.setString(4, description);
+            pstmt.setString(5, filePaths); // Passes the file paths as a part of the SQL statement
             int affectedRows = pstmt.executeUpdate();
 
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        generatedId = generatedKeys.getInt(1);
+                        int generatedId = generatedKeys.getInt(1);
+                        String responseTime = getResponseTimeBySeverity(severity); // Determine response time based on severity
+                        // Send email notification using the existing EmailService instance
+                        String recipientEmail = "ids517helpdesk@gmail.com";
+                        String subject = "New Service Request Created";
+                        String body = "A new service request has been created:\n\n" +
+                                "Problem: " + problem + "\n" +
+                                "Severity: " + severity + "\n" +
+                                "Submitted By: " + submittedByName + "\n" +
+                                "Description: " + description + "\n" +
+                                "Attached Files: " + filePaths;
+                        emailService.sendEmail(recipientEmail, subject, body);
+                        JOptionPane.showMessageDialog(this, "Your request has been submitted successfully. Your ticket ID is " + generatedId + ". Helpdesk team will reach out to you within " + responseTime + ".");
+                        this.dispose(); // Close window after successful submission
                     }
                 }
             }
-
-            // Send email notification using the existing EmailService instance
-            String recipientEmail = "ids517helpdesk@gmail.com";
-            String subject = "New Service Request Created";
-            String body = "A new service request has been created:\n\n" +
-                    "Problem: " + problem + "\n" +
-                    "Severity: " + severity + "\n" +
-                    "Submitted By: " + submittedByName + "\n" +
-                    "Description: " + description;
-            emailService.sendEmail(recipientEmail, subject, body);
-
-            // Process pending requests (optional)
-            requestHandler.processPendingRequests();
-
-            JOptionPane.showMessageDialog(this, "Your request has been submitted successfully. Your ticket ID is " + generatedId + ". Helpdesk team will reach out to you within 4 hours.");
-            this.dispose(); // Close window after successful submission
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Failed to submit the request: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new CreateRequestFrame().setVisible(true));
