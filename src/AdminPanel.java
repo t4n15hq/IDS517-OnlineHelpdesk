@@ -47,7 +47,7 @@ public class AdminPanel extends JFrame {
 
     private JPanel createServiceRequestsTab() {
         JPanel requestsPanel = new JPanel(new BorderLayout());
-        serviceRequestsTableModel = new DefaultTableModel(new String[]{"RequestID", "Problem", "Severity", "Description", "Status"}, 0);
+        serviceRequestsTableModel = new DefaultTableModel(new String[]{"RequestID", "Problem","Priority", "Severity","SubmittedBy", "Description", "Status"}, 0);
         serviceRequestsTable = new JTable(serviceRequestsTableModel);
         requestsPanel.add(new JScrollPane(serviceRequestsTable), BorderLayout.CENTER);
         JPanel requestsButtonPanel = new JPanel();
@@ -178,12 +178,14 @@ public class AdminPanel extends JFrame {
         serviceRequestsTableModel.setRowCount(0);
         try (Connection conn = DatabaseHelper.connect();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT RequestID, Problem, Severity, Description, Status FROM ServiceRequests")) {
+             ResultSet rs = stmt.executeQuery("SELECT RequestID, Problem,Priority, Severity,SubmittedBy, Description, Status FROM ServiceRequests")) {
             while (rs.next()) {
                 serviceRequestsTableModel.addRow(new Object[]{
                         rs.getInt("RequestID"),
                         rs.getString("Problem"),
+                        rs.getString("Priority"),
                         rs.getString("Severity"),
+                        rs.getString("SubmittedBy"),
                         rs.getString("Description"),
                         rs.getString("Status")
                 });

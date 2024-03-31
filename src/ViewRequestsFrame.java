@@ -47,7 +47,7 @@ public class ViewRequestsFrame extends JFrame {
 
     private void initializeTable() {
         String[] columnNames = {
-                "RequestID", "Problem", "Priority", "Severity", "Description", "Status", "Submitted By", "Assigned To", "Request Raised", "Resolution Date"
+                "RequestID", "Problem", "Priority", "Severity", "Description", "Status","Comment", "Submitted By", "Assigned To", "Request Raised", "Resolution Date"
         };
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -69,7 +69,7 @@ public class ViewRequestsFrame extends JFrame {
 
     private void loadDataFromDatabase() {
         tableModel.setRowCount(0); // Clear existing data
-        String sql = "SELECT RequestID, Problem, Priority, Severity, Description, Status, SubmittedBy, Timestamp, ResolutionDate FROM ServiceRequests";
+        String sql = "SELECT RequestID, Problem, Priority, Severity, Description, Status,Comment, SubmittedBy, Timestamp, ResolutionDate FROM ServiceRequests";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Object[] row = {
@@ -79,8 +79,9 @@ public class ViewRequestsFrame extends JFrame {
                         rs.getString("Severity"),
                         rs.getString("Description"),
                         rs.getString("Status"),
+                        rs.getString("Comment"), // Adding the comment to the row data
                         rs.getString("SubmittedBy"),
-                        "IT Helpdesk", // Placeholder, you might need to adjust this
+                        "IT Helpdesk", // Placeholder, adjust as necessary
                         rs.getTimestamp("Timestamp"),
                         rs.getDate("ResolutionDate")
                 };

@@ -28,7 +28,7 @@ public class ManagerApprovalFrame extends JFrame {
 
     private void initializeUI() {
         String[] columnNames = {
-                "ID", "Problem", "Severity", "Priority", "Description", "Status", "Timestamp", "Resolution Date"
+                "ID", "Problem", "Severity", "Priority","SubmittedBy", "Description", "Status", "Timestamp", "Resolution Date"
         };
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -70,7 +70,7 @@ public class ManagerApprovalFrame extends JFrame {
 
     private void loadDataFromDatabase() {
         tableModel.setRowCount(0);
-        String sql = "SELECT RequestID, Problem, Severity, Priority, Description, Status, Timestamp, ResolutionDate FROM ServiceRequests";
+        String sql = "SELECT RequestID, Problem, Severity, Priority,SubmittedBy, Description, Status, Timestamp, ResolutionDate FROM ServiceRequests";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Object[] row = {
@@ -78,6 +78,7 @@ public class ManagerApprovalFrame extends JFrame {
                         rs.getString("Problem"),
                         rs.getString("Severity"),
                         rs.getString("Priority"),
+                        rs.getString("SubmittedBy"),
                         rs.getString("Description"),
                         rs.getString("Status"),
                         rs.getTimestamp("Timestamp"),

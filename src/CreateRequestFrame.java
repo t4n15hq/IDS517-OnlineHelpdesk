@@ -49,8 +49,7 @@ public class CreateRequestFrame extends JFrame {
         makeComponentOpaque(severityComboBox);
 
         submittedByNameField = new JTextField(20);
-        submittedByNameField.setText(UserSession.getLoggedInUserName()); // Auto-populate with logged-in user's name
-        submittedByNameField.setEditable(false);
+        submittedByNameField.setEditable(true);
         makeComponentOpaque(submittedByNameField);
 
 
